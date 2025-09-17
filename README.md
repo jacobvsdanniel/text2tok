@@ -27,7 +27,7 @@ text_list = [
     "最多容納59,000個人,或5.9萬人,坪數對人數為1:3.",
 ]
 
-cache_dir = "/volume/medical-llm/cache/hf_cache"
+cache_dir = "/root/hf_cache"
 bpe_model = "Qwen/Qwen3-8B"
 bert_model = "google-bert/bert-base-multilingual-cased"
 

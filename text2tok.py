@@ -4,16 +4,24 @@ import logging
 import unicodedata
 
 import regex as re
-from transformers import AutoTokenizer
+
 try:
     import icu
 except ModuleNotFoundError:
-    logging.warning(
+    logging.info(
         "PyICU is not installed.\n"
-        "If ICU-based tokenizer is needed, install PyICU by:\n"
+        "If ICU-based tokenizers are needed, install PyICU:\n"
         "$ apt install pkg-config libicu-dev\n"
         "$ pip install --no-binary=:pyicu: pyicu"
     )
+
+original_level = os.environ.get("TRANSFORMERS_VERBOSITY")
+os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+from transformers import AutoTokenizer
+if original_level is None:
+    del os.environ["TRANSFORMERS_VERBOSITY"]
+else:
+    os.environ["TRANSFORMERS_VERBOSITY"] = original_level
 
 """
 utilities
