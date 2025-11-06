@@ -154,6 +154,56 @@ class CJKBigramEnStopTokenizer:
 
         return token_list
 
+    @classmethod
+    def fold_stop_tokenize(cls, text):
+        if not text:
+            return []
+
+        # first character
+        c = text[0]
+        buffer_is_cjk = unicodedata.name(c, "").startswith("CJK")
+        buffer = [c]
+
+        # loop through all characters
+        token_list = []
+        for c in text[1:]:
+            c_is_cjk = unicodedata.name(c, "").startswith("CJK")
+
+            if buffer_is_cjk:
+                if c_is_cjk:
+                    buffer.append(c)
+                else:
+                    if len(buffer) == 1:
+                        token_list.append(buffer[0])
+                    else:
+                        for i in range(len(buffer) - 1):
+                            token_list.append(buffer[i] + buffer[i + 1])
+                    buffer = [c]
+                    buffer_is_cjk = False
+            else:
+                if c_is_cjk:
+                    token = "".join(buffer).lower()
+                    if token not in EnStopWord.stop_word_dict:
+                        token_list.append(token)
+                    buffer = [c]
+                    buffer_is_cjk = True
+                else:
+                    buffer.append(c)
+
+        # remaining buffer
+        if buffer_is_cjk:
+            if len(buffer) == 1:
+                token_list.append(buffer[0])
+            else:
+                for i in range(len(buffer) - 1):
+                    token_list.append(buffer[i] + buffer[i + 1])
+        else:
+            token = "".join(buffer).lower()
+            if token not in EnStopWord.stop_word_dict:
+                token_list.append(token)
+
+        return token_list
+
 
 """
 regex-based methodology
@@ -180,8 +230,18 @@ class RegexFoldCJKBigramEnStopTokenizer:
         ]
         return token_list
 
+    @classmethod
+    def fast_tokenize(cls, text):
+        token_list = [
+            en_fold_stop_word_or_cjk_bigram
+            for word in cls.word_pattern.findall(text)
+            for en_fold_stop_word_or_cjk_bigram in CJKBigramEnStopTokenizer.fold_stop_tokenize(word)
+        ]
+        return token_list
+
 
 reg_tokenize = RegexFoldCJKBigramEnStopTokenizer.tokenize
+reg_fast_tokenize = RegexFoldCJKBigramEnStopTokenizer.fast_tokenize
 
 
 """
@@ -217,6 +277,24 @@ class ICUTokenizer:
             i = j
         return token_list
 
+    @classmethod
+    def fold_stop_tokenize(cls, text):
+        text = "".join(c for c in text if c not in cls.emoji_removal_set)
+
+        it = icu.BreakIterator.createWordInstance(icu.Locale("und"))
+        it.setText(text)
+        i = it.first()
+        token_list = []
+
+        for j in it:
+            status = it.getRuleStatus()
+            if status > 0:  # status 0: spaces, punctuation, symbols
+                token = text[i:j].lower()
+                if token not in EnStopWord.stop_word_dict:
+                    token_list.append(token)
+            i = j
+        return token_list
+
 
 class ICURegexFoldEnStopTokenizer:
     # y'all've --> y 'all 've
@@ -240,6 +318,7 @@ class ICURegexFoldEnStopTokenizer:
 
 
 icu_tokenize = ICURegexFoldEnStopTokenizer.tokenize
+icu_fast_tokenize = ICUTokenizer.fold_stop_tokenize
 
 
 """
@@ -348,6 +427,8 @@ def _main():
         tokenize_list = [
             ("REG", reg_tokenize),
             ("ICU", icu_tokenize),
+            ("REF", reg_fast_tokenize),
+            ("ICF", icu_fast_tokenize),
             ("BPE", BPETokenizer("Qwen/Qwen3-8B", cache_dir=None)),
             ("BRT", BERTTokenizer("google-bert/bert-base-multilingual-cased", cache_dir=None)),
         ]
