@@ -8,11 +8,8 @@ Text tokenizers optimized for sparse retrieval.
 ## Installation
 
 ```
-python -m pip install text2tok
-
-# (optional) enabling ICU-based tokenizers
 apt install pkg-config libicu-dev
-python -m pip install --no-binary=:pyicu: pyicu
+python -m pip install text2tok
 ```
 
 ## Usage
