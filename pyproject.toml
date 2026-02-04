@@ -1,6 +1,6 @@
 [project]
 name = "text2tok"
-version = "1.2.1"
+version = "1.2.2"
 authors = [
     { name="Li Peng-Hsuan", email="jacobvsdanniel@gmail.com" },
 ]
@@ -21,9 +21,6 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://github.com/jacobvsdanniel/text2tok"
-
-[tool.uv.pip]
-no-binary = ["pyicu"]
 
 [build-system]
 requires = ["hatchling"]

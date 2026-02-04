@@ -327,9 +327,7 @@ LLM-based methodology
 
 
 class BPETokenizer:
-    def __init__(self, model_name, cache_dir=None):
-        if cache_dir:
-            os.environ["HF_HOME"] = cache_dir
+    def __init__(self, model_name):
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         return
 
@@ -376,9 +374,7 @@ class BPETokenizer:
 
 
 class BERTTokenizer:
-    def __init__(self, model_name, cache_dir=None):
-        if cache_dir:
-            os.environ["HF_HOME"] = cache_dir
+    def __init__(self, model_name):
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         return
 
@@ -404,50 +400,3 @@ class BERTTokenizer:
                 stripped_tokenized_text.append(token)
 
         return stripped_tokenized_text
-
-
-"""
-usage
-"""
-
-
-def _main():
-    text_list = [
-        "",
-        "去過中國science院，覺得it's pretty good。",
-        "I'm having a state-of-the-art \"whopper\" at Mendy's and James'.",
-        "中國科學院，今天天氣真好，嗎",
-        "I can’t ‘admire’ such a 'beautiful' dog.",
-        "y'all've done “GOOD”.",
-        "最多容納59,000個人,或5.9萬人,坪數對人數為1:3.",
-        f"I have a {chr(0x1F525)} dream such that the sun is cold.",
-    ]
-
-    if "icu" in sys.modules:
-        tokenize_list = [
-            ("REG", reg_tokenize),
-            ("ICU", icu_tokenize),
-            ("REF", reg_fast_tokenize),
-            ("ICF", icu_fast_tokenize),
-            ("BPE", BPETokenizer("Qwen/Qwen3-8B", cache_dir=None)),
-            ("BRT", BERTTokenizer("google-bert/bert-base-multilingual-cased", cache_dir=None)),
-        ]
-    else:
-        tokenize_list = [
-            ("REG", reg_tokenize),
-            ("BPE", BPETokenizer("Qwen/Qwen3-8B", cache_dir=None)),
-            ("BRT", BERTTokenizer("google-bert/bert-base-multilingual-cased", cache_dir=None)),
-        ]
-
-    for text in text_list:
-        print(f"{text}")
-        for name, tokenize in tokenize_list:
-            token_list = tokenize(text)
-            print(f"[{name}] {token_list}")
-        print("\n")
-    return
-
-
-if __name__ == "__main__":
-    _main()
-    sys.exit()

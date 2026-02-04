@@ -9,7 +9,7 @@ Text tokenizers optimized for sparse retrieval.
 
 ```
 apt install pkg-config libicu-dev
-python -m pip install text2tok
+python -m pip install --no-binary=:pyicu: text2tok
 ```
 
 ## Usage
