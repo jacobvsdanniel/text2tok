@@ -3,7 +3,10 @@
 [![PyPI version](https://img.shields.io/pypi/v/text2tok.svg?maxAge=3600)](https://pypi.org/project/text2tok)
 [![PyPI license](https://img.shields.io/pypi/l/text2tok.svg?maxAge=3600)](https://github.com/jacobvsdanniel/text2tok/blob/master/LICENSE)
 
-Text tokenizers optimized for sparse retrieval.
+*Text tokenizers optimized for sparse retrieval.*
+
+Authors
+- Li Peng-Hsuan (李朋軒) @ ailabs.tw (jacobvsdanniel [at] gmail.com)
 
 ## Installation
 
